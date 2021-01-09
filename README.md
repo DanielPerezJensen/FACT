@@ -1,6 +1,8 @@
 # FACT
 Repository for our group project for the FACT course taken as part of the Master of AI at the UVA.
 
+# Code Structure
+```
 .
 ├── AUTHORS.md
 ├── README.md
@@ -16,3 +18,4 @@ Repository for our group project for the FACT course taken as part of the Master
     ├── code <- scripts for processing data eg. transformations, dataset merges, testing models etc. 
     ├── models    <- scripts for generating models
 |--- requirements.txt <- file with libraries and library versions for recreating the environment
+```
