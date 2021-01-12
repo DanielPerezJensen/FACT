@@ -1,0 +1,48 @@
+DYLAN:
+All file path's are hardcoded, meaning that files won't be always added to the right directories and they need to be adjusted throughout the whole file.
+Files are a mess, imports do not make sense since they import files with the wrong names, so they need to be adjusted accordingly
+No comments through the files
+Models and parameters get defined multiple times, old test files aren't deleted, causing a mess.
+README incomplete, The CVAE usses different classes then the MNIST_CNN_train file, the CVAE file had to be adjusted accordingly
+Image size has not been defined correctly
+Old causaleffect.py used in CVAE.py, causing code not to run
+Alpha not defined correctly
+Objective has to be IND_UNCOND
+imsave function from scipy is deprecated and needs to be replaced
+tensors not properly detached from GPU in make_mnist_qual.py
+Only the alpha plot is generated
+
+What is this even?:
+lambda_change = [0.001]
+obj_change = ["JOINT_UNCOND"]
+alpha_change = [0]
+z_dim_change = [1,2,3,4,5,6,7,8,9]
+for obj_use  in obj_change:
+    for z_use in z_dim_change:
+        for lam_use in lambda_change:
+            for alpha_use in alpha_change:
+                trail_results = CVAE(
+                    steps = 8000,
+                    batch_size = 32,
+                    lam_ML = lam_use,
+                    decoder_net = "VAE_fMNIST",
+                    classifier_net = "cnn_fmnist",
+                    use_ce = False,
+                    objective = obj_use,
+                    data_type = "fmnist",
+                    break_up_ce= True,
+                    x_dim = 3,
+                    z_dim = z_use,
+                    z_dim_true = z_use,
+                    y_dim =3,
+                    alpha_dim = alpha_use,
+                    lr = 0.0001, 
+                    No = 100,
+                    Ni = 25,
+                    randseed = 0,
+                    save_output = True,
+                    debug_level = 1,
+                    debug_plot = True,
+                    save_plot = False,
+                    c_dim= 1,
+                    img_size= 28)
