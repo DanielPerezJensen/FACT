@@ -1,8 +1,8 @@
 # FACT
 Repository for our group project for the FACT course taken as part of the Master of AI at the UVA.
 
-Reproducibililty study of [M. O’Shaughnessy, G. Canal, M. Connor, M. Davenport, and C. Rozell. Generative causal explanations of black-box classifiers. In NeurIPS, 2020"](https://arxiv.org/abs/2006.13913)
-=======
+Reproducibility of"[Generative causal explanations of black-box classifiers](https://arxiv.org/abs/2006.13913)" by Matt O'Shaughnessy, Greg Canal, Marissa Connor, Mark Davenport, and Chris Rozell (Proc. NeurIPS 2020).
+
 # Code Structure
 ```
 .
