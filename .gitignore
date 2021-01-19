@@ -138,4 +138,5 @@ bin/
 /data/raw
 
 # exclude external models from source control
-/src/external/
+/src/datasets/
+/src/pretrained_models/
