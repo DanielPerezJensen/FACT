@@ -3,7 +3,7 @@ import numpy as np
 import scipy.io as sio
 
 def load_mnist_idx(data_type):
-       data_dir = 'datasets/mnist/'
+       data_dir = 'data/mnist/'
        fd = open(os.path.join(data_dir,'train-images.idx3-ubyte'))
        loaded = np.fromfile(file=fd,dtype=np.uint8)
        trX = loaded[16:].reshape((60000,28,28,1)).astype(np.float)
@@ -59,7 +59,7 @@ def load_mnist_classSelect(data_type,class_use,newClass):
 
 def load_fashion_mnist_idx(data_type):
     import mnist_reader
-    data_dir = 'datasets/fmnist/'
+    data_dir = 'data/fmnist/'
     if data_type == "train":
         X, y = mnist_reader.load_mnist(data_dir, kind='train')
     elif data_type == "test" or data_type == "val":
@@ -105,7 +105,7 @@ def load_fashion_mnist_classSelect(data_type,class_use,newClass):
     
 
 def load_svhn_idx(data_type):
-       data_dir = 'datasets/SVHN/'
+       data_dir = 'data/SVHN/'
        if data_type == "train":
            data = sio.loadmat(data_dir + 'train_32x32.mat')
            X = data['X'].astype(np.float)

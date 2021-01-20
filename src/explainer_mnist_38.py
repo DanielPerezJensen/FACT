@@ -19,7 +19,7 @@ from GCE import GenerativeCausalExplainer
 # dataset
 data_classes = [3, 8]
 # classifier
-classifier_path = './pretrained_models/mnist_38_classifier'
+classifier_path = 'data/pretrained_models/mnist_38_classifier'
 # vae
 K = 1
 L = 7
@@ -31,9 +31,9 @@ batch_size = 64
 lr = 5e-4
 # other
 randseed = 0
-gce_path = './pretrained_models/mnist_38_gce'
-retrain_gce = False # train explanatory VAE from scratch
-save_gce = False # save/overwrite pretrained explanatory VAE at gce_path
+gce_path = 'data/pretrained_models/mnist_38_gce'
+retrain_gce = True # train explanatory VAE from scratch
+save_gce = True # save/overwrite pretrained explanatory VAE at gce_path
 
 
 # --- initialize ---
