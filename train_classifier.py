@@ -81,7 +81,7 @@ def main():
     elif model_name.lower() == "densenet":
         classifier = classifiers.DenseNetDerivative(num_classes=y_dim).to(device)
     else:
-        raise InputError("Invalid model_name, options=['InceptionNet', 'ResNet', 'DenseNet']")
+        raise ValueError("Invalid model_name, options=['InceptionNet', 'ResNet', 'DenseNet']")
 
     optimizer = torch.optim.SGD(classifier.parameters(), lr=lr, momentum=momentum)
     scheduler = StepLR(optimizer, step_size=1, gamma=0.7)
@@ -120,7 +120,7 @@ def main():
 
             print("[{}] Train Epoch {:02d}/{:02d}, Batch Size = {}, \
                   train loss = {:.3f}, train acc = {:.2f}".format(
-                    datetime.datetime.now().strftime("%Y-%m-%d %H:%M"), epoch,
+                    datetime.datetime.now().strftime("%Y-%m-%d %H:%M"), epoch + 1,
                     epochs, batch_size, loss.item(), acc))
 
         total_train_loss /= batch_idxs
@@ -159,7 +159,7 @@ def main():
 
         print("[{}] Test Epoch {:02d}/{:02d}, \
               test loss = {:.3f}, test acc = {:.2f}".format(
-                datetime.datetime.now().strftime("%Y-%m-%d %H:%M"), epoch,
+                datetime.datetime.now().strftime("%Y-%m-%d %H:%M"), epoch + 1,
                 epochs, total_test_loss, total_test_acc))
 
         scheduler.step()
@@ -181,7 +181,7 @@ if __name__ == "__main__":
                              "separate them. Example \"3 8\".")
     parser.add_argument("--batch_size", type=int, default=64,
                         help="Specification of batch size to be used.")
-    parser.add_argument("--epochs", type=int, default=50,
+    parser.add_argument("--epochs", type=int, default=10,
                         help="Specification of training epochs.")
     parser.add_argument("--lr", type=float, default=0.1,
                         help="Specification of learning rate for SGD")

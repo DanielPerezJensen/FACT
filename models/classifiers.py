@@ -246,7 +246,7 @@ class TransitionLayer(nn.Module):
 
 class DenseNetDerivative(nn.Module):
     """Derivative of ResNet with only one group of blocks"""
-    def __init__(self, num_classes=2, num_layers=[3, 3], bn_size=2, growth_rate=16, act_fn=nn.ReLU):
+    def __init__(self, num_classes=2, num_layers=[3], bn_size=2, growth_rate=16, act_fn=nn.ReLU):
         super().__init__()
 
         c_hidden = growth_rate * bn_size
