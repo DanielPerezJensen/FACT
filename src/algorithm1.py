@@ -33,9 +33,9 @@ def run_algorithm_1():
                                      print_train_losses, lam_step,
                                      D_optimal, C_crit=C_crit, D_crit=D_crit)
 
-    print results
+    # print results
     print_results(vary_L_results, vary_K_L_lambda_results)
-    save results
+    # save results
     save_results(vary_L_results, vary_K_L_lambda_results, dataset, classes_used, output_folder)
 
 def step_1(dataset, classes_used, K, L, lam, print_train_losses, L_step, criteria=1):
