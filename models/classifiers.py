@@ -170,7 +170,7 @@ class ResNetDerivative(nn.Module):
         y = self.output_net(x)
         prob = F.softmax(y, dim=-1)
 
-        return y, prob
+        return prob, y
 
 
 class DenseLayer(nn.Module):
