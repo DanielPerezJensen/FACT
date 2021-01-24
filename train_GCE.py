@@ -112,7 +112,8 @@ def main():
         encoder = Encoder(K+L, c_dim, x_dim).to(device)
         decoder = Decoder(K+L, c_dim, x_dim).to(device)
         # Load GCE from stored model
-        gce = GenerativeCausalExplainer(classifier, decoder, encoder, device)
+        gce = GenerativeCausalExplainer(classifier, decoder, encoder, device,
+                                        save_output=True, save_dir=gce_path)
         checkpoint = torch.load(os.path.join(gce_path, 'model.pt'), map_location=device)
 
         gce.classifier.load_state_dict(checkpoint["model_state_dict_classifier"])
@@ -120,7 +121,7 @@ def main():
         gce.decoder.load_state_dict(checkpoint["model_state_dict_decoder"])
 
         if checkpoint["step"] < train_steps:
-            print(f"Continuing training previous model from step: {checkpoint['step']} with loss: {checkpoint['loss']}")
+            print(f"Continuing training previous model from step: {checkpoint['step']}")
             traininfo = gce.train(X, K, L,
                                   steps=train_steps - checkpoint["step"],
                                   Nalpha=Nalpha,
@@ -159,9 +160,9 @@ if __name__ == "__main__":
                         help="Specification of number of non-causal Factors")
     parser.add_argument("--lam", type=float, default=0.05,
                         help="Specification of lambda parameter")
-    parser.add_argument("--Nalpha", type=int, default=25,
+    parser.add_argument("--Nalpha", type=int, default=15,
                         help="Specification of number of samples to estimate alpha")
-    parser.add_argument("--Nbeta", type=int, default=100,
+    parser.add_argument("--Nbeta", type=int, default=75,
                         help="Specification of number of samples to estimate beta")
     parser.add_argument("--seed", type=int, default=1,
                         help="Specification of random seed of this run")
