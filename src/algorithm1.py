@@ -52,6 +52,7 @@ def step_1(dataset, classes_used, K, L, lam, print_train_losses, L_step, criteri
 
         # relative improvement of distance D
         D_rel_improvement = (D_new - D) / D * 100
+        print('Using L={}, the relative improvement of D_new: {}%'.format(L, D_rel_improvement))
 
         # save results
         vary_L_results.append([L, D])
@@ -92,15 +93,17 @@ def step_2(dataset, classes_used, K, L, lam, print_train_losses, lam_step, D_opt
             # calculate relative difference of distance D
             D_new = np.mean(train_results['loss_nll'][-500:])
             D_rel_diff = (D_new - D_optimal) / D_optimal * 100
-        
+            print('Relative difference between D and D_optimal: {}%'.format(D_rel_diff))
         print("Optimal lambda={}".format(lam_use))
         
         # if C approaches optimal C, save causal effect
-        C_new = np.mean(train_results['loss_ce'][-500])
+        C_new = np.mean(train_results['loss_ce'][-500:])
         C_rel_improvement = (C_new - C) / C * 100
-        
+        print('Relative improvement between C_new and C: {}%'.format(
+            D_rel_diff))
+
         # save all variables per step
-        total_loss = train_results['loss'][-1]
+        total_loss = np.mean(train_results['loss'][-500:])
         vary_K_L_lambda_results.append([K, L, lam_use, C_new, D_new, total_loss])
         
         # init for next cycle
