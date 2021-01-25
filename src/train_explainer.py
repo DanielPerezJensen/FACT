@@ -46,12 +46,16 @@ def train_explainer(dataset, classes_used, K, L, lam, print_train_losses=True):
     ylabels = range(0,len(data_classes_lst))
 
     # --- load data ---
-    from load_mnist import load_mnist_classSelect
-    X, Y, tridx = load_mnist_classSelect('train', data_classes_lst, ylabels)
-    vaX, vaY, vaidx = load_mnist_classSelect('val', data_classes_lst, ylabels)
+    from load_mnist import load_mnist_classSelect, load_fashion_mnist_classSelect
+    if dataset == 'mnist':
+        fn = load_mnist_classSelect
+    elif dataset == 'fmnist':
+        fn = load_fashion_mnist_classSelect
+    
+    X, Y, tridx = fn('train', data_classes_lst, ylabels)
+    vaX, vaY, vaidx = fn('val', data_classes_lst, ylabels)
     ntrain, nrow, ncol, c_dim = X.shape
     x_dim = nrow*ncol
-    
     
     # --- load classifier ---
     from models.CNN_classifier import CNN
