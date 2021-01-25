@@ -6,6 +6,7 @@
     explanation for CNN classifier trained on MNIST 3/8 digits.
 """
 import argparse
+import math
 import numpy as np
 import scipy.io as sio
 import os
@@ -19,24 +20,23 @@ def train_explainer(dataset, classes_used, K, L, lam, print_train_losses=True):
     # --- parameters ---
     # dataset
     data_classes_lst = [int(i) for i in str(classes_used)]
-    dataset = dataset + '_' + str(classes_used)
+    dataset_name_full = dataset + '_' + str(classes_used)
     
     # classifier
-    classifier_path = 'data/pretrained_models/{}_classifier'.format(dataset)
+    classifier_path = 'data/pretrained_models/{}_classifier'.format(dataset_name_full)
 
     # GCE params
     randseed = 0
-    gce_path = os.path.join('outputs', dataset + '_gce_K{}_L{}_lambda{}'.format(K, L, str(lam).replace('.', "")))
+    gce_path = os.path.join('outputs', dataset_name_full + '_gce_K{}_L{}_lambda{}'.format(K, L, str(lam).replace('.', "")))
     retrain_gce = True  # train explanatory VAE from scratch
     save_gce = True  # save/overwrite pretrained explanatory VAE at gce_path
     
     # other train params
-    train_steps = 2000 #8000
+    train_steps = 2 #8000
     Nalpha = 25
     Nbeta = 100
     batch_size = 64
     lr = 5e-4
-
     
     # --- initialize ---
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -108,8 +108,16 @@ def train_explainer(dataset, classes_used, K, L, lam, print_train_losses=True):
     
     
     # --- generate explanation and create figure ---
-    sample_ind = np.concatenate((np.where(vaY == 0)[0][:4],
-                                 np.where(vaY == 1)[0][:4]))
+    nr_labels = len(data_classes_lst)
+    nr_samples_fig = 8
+    sample_ind = np.empty(0)
+    
+    # retrieve samples from each class
+    samples_per_class = math.ceil(nr_samples_fig / nr_labels)
+    for i in range(nr_labels):
+        samples_per_class = math.ceil((nr_samples_fig - i * samples_per_class) / (nr_labels - i))
+        sample_ind = np.concatenate([sample_ind, np.where(vaY == i)[0][:samples_per_class]])
+        
     x = torch.from_numpy(vaX[sample_ind])
     zs_sweep = [-3., -2., -1., 0., 1., 2., 3.]
     Xhats, yhats = gce.explain(x, zs_sweep)
