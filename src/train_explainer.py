@@ -51,7 +51,9 @@ def train_explainer(dataset, classes_used, K, L, lam, print_train_losses=True):
         fn = load_mnist_classSelect
     elif dataset == 'fmnist':
         fn = load_fashion_mnist_classSelect
-    
+    else:
+        print('dataset not correctly specified')
+        
     X, Y, tridx = fn('train', data_classes_lst, ylabels)
     vaX, vaY, vaidx = fn('val', data_classes_lst, ylabels)
     ntrain, nrow, ncol, c_dim = X.shape
