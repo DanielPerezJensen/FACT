@@ -45,12 +45,13 @@ def step_1(dataset, classes_used, K, L, lam, print_train_losses, L_step, criteri
     D_rel_improvement = 999
     vary_L_results = ['L', 'D_results']
     
-    while D_rel_improvement > criteria:
+    while D_rel_improvement < -criteria:
         train_results = train_explainer(dataset, classes_used, K, L, lam, print_train_losses)
-        D_new = train_results['loss_nll'][-1]
+        # retrieve average of last 500 training steps to compare with previous run
+        D_new = np.mean(train_results['loss_nll'][-500:])
 
         # relative improvement of distance D
-        D_rel_improvement = (abs((D_new - D)) / D) * 100
+        D_rel_improvement = (D_new - D) / D * 100
 
         # save results
         vary_L_results.append([L, D])
@@ -75,7 +76,7 @@ def step_2(dataset, classes_used, K, L, lam, print_train_losses, lam_step, D_opt
     vary_K_L_lambda_results = ['K', 'L', 'lambda', 'C', 'D', 'total_loss']
     
     # change K,L,lambda until C plateaus
-    while C_rel_improvement > C_crit:  # % improvement on distance
+    while C_rel_improvement < -C_crit:  # % improvement on distance
         K += 1
         L -= 1
         print("Now training with K={} and L={}".format(K, L))
@@ -89,14 +90,14 @@ def step_2(dataset, classes_used, K, L, lam, print_train_losses, lam_step, D_opt
                                             lam_use, print_train_losses)
             
             # calculate relative difference of distance D
-            D_new = train_results['loss_nll'][-1]
-            D_rel_diff = (abs((D_new - D_optimal)) / D_optimal) * 100
+            D_new = np.mean(train_results['loss_nll'][-500:])
+            D_rel_diff = (D_new - D_optimal) / D_optimal * 100
         
         print("Optimal lambda={}".format(lam_use))
         
         # if C approaches optimal C, save causal effect
-        C_new = train_results['loss_ce'][-1]
-        C_rel_improvement = (abs((C_new - C)) / C) * 100
+        C_new = np.mean(train_results['loss_ce'][-500])
+        C_rel_improvement = (C_new - C) / C * 100
         
         # save all variables per step
         total_loss = train_results['loss'][-1]
