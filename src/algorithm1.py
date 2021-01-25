@@ -14,7 +14,7 @@ def run_algorithm_1():
     K = 0
     L = 1  # start with 1 latent variable
     L_step = 2
-    lam = 0
+    lam = 0.01
     lam_step = 0.01
     
     # criteria step 1 (in percentual improvement between consecutive runs)
@@ -37,6 +37,7 @@ def run_algorithm_1():
     print_results(vary_L_results, vary_K_L_lambda_results)
     # save results
     save_results(vary_L_results, vary_K_L_lambda_results, dataset, classes_used, output_folder)
+
 
 def step_1(dataset, classes_used, K, L, lam, print_train_losses, L_step, criteria=1):
     # init variables
@@ -63,6 +64,7 @@ def step_1(dataset, classes_used, K, L, lam, print_train_losses, L_step, criteri
     
     # return optimal D and L before plateau is reached
     return D, L_optimal, vary_L_results
+    
     
 def step_2(dataset, classes_used, K, L, lam, print_train_losses, lam_step, D_optimal, C_crit=1, D_crit=1):
     # init variables
