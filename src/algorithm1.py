@@ -84,6 +84,7 @@ def step_2(dataset, classes_used, K, L, lam, print_train_losses, lam_step,
     C_rel_improvement = 999
     C = -0.0001
     D_rel_diff = 999
+    D_rel_diff_old = 999
     lam_use = 0
     vary_K_L_lambda_results = [['K', 'L', 'lambda', 'C', 'D', 'total_loss']]
     
@@ -104,8 +105,16 @@ def step_2(dataset, classes_used, K, L, lam, print_train_losses, lam_step,
             # calculate relative difference of distance D
             D_new = np.mean(train_results['loss_nll'][-500:])
             D_rel_diff = ((D_new - D_optimal) / D_optimal * 100)
-            print('D_new={}, D_optimal={}'.format(D_new, D_optimal))
+            print('D_new={}, D={}'.format(D_new, D_optimal))
             print('D is still {:.2f}% worse than D_optimal'.format(D_rel_diff))
+            
+            # if the D_new is becoming worse, stop iterating and use previous lambda
+            if D_rel_diff > D_rel_diff_old:
+                lam_use -= lam_step
+                break
+            
+            D_rel_diff_old = D_rel_diff
+        
         print("Optimal lambda={}".format(lam_use))
         
         # if C approaches optimal C, save causal effect
