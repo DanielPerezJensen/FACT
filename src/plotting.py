@@ -63,7 +63,7 @@ def plotExplanation(Xhats, yhats, save_path=None):
         axs[0,round(nz_sweep/2)-1].set_title('Sweep latent dimension %d' % (latent_dim+1))
         if save_path is not None:
             plt.savefig(os.path.join(save_path, 'latentdim{}.svg'.format(latent_dim+1)), bbox_inches=0)
-
+        plt.close(fig)
 
 def outline_mask(ax, mask, bounds=(0,1,0,1), color=(0,0,0,0.25)):
     # https://stackoverflow.com/questions/24539296/outline-a-region-in-a-graph
