@@ -124,7 +124,8 @@ def step_2(dataset, classes_used, K, L, lam, print_train_losses, lam_step,
         C = C_new
         D_rel_diff = 999
         lam_use = 0
-        
+
+        # stop execution when L reached 0
         if L == 0:
             print('C did not reach plateau, and L is 0')
             return vary_K_L_lambda_results
