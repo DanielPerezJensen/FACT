@@ -41,9 +41,9 @@ class GenerativeCausalExplainer:
                        'debug_print' : debug_print}
         if self.params['save_dir'] is not None and not os.path.exists(self.params['save_dir']):
             os.makedirs(self.params['save_dir'])
-        if self.params['debug_print']:
-            print("Parameters:")
-            print(self.params)
+        # if self.params['debug_print']:
+        #     print("Parameters:")
+        #     print(self.params)
         self._writer = SummaryWriter(self.params['save_dir'], filename_suffix=os.path.split(self.params['save_dir'])[1])
 
     """

@@ -32,7 +32,7 @@ def train_explainer(dataset, classes_used, K, L, lam, print_train_losses=True):
     save_gce = True  # save/overwrite pretrained explanatory VAE at gce_path
     
     # other train params
-    train_steps = 2 #8000
+    train_steps = 1 #8000
     Nalpha = 25
     Nbeta = 100
     batch_size = 64
@@ -110,7 +110,7 @@ def train_explainer(dataset, classes_used, K, L, lam, print_train_losses=True):
     # --- generate explanation and create figure ---
     nr_labels = len(data_classes_lst)
     nr_samples_fig = 8
-    sample_ind = np.empty(0)
+    sample_ind = np.empty(0, dtype=int)
     
     # retrieve samples from each class
     samples_per_class = math.ceil(nr_samples_fig / nr_labels)
