@@ -32,7 +32,7 @@ def train_explainer(dataset, classes_used, K, L, lam, print_train_losses=True):
     save_gce = True  # save/overwrite pretrained explanatory VAE at gce_path
     
     # other train params
-    train_steps = 1 #8000
+    train_steps = 4000 #8000
     Nalpha = 25
     Nbeta = 100
     batch_size = 64

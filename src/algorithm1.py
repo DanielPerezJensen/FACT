@@ -3,8 +3,8 @@ import numpy as np
 
 def run_algorithm_1():
     # dataset params todo: change when needed
-    dataset = 'mnist'  # 'fmnist'
-    classes_used = 38  # 034
+    dataset = 'fmnist'  # 'fmnist'
+    classes_used = '034'  # 034
     output_folder = 'outputs/'
 
     # print training losses per step
@@ -28,7 +28,7 @@ def run_algorithm_1():
                                           print_train_losses, L_step,
                                           criteria=criteria)
     ## STEP 2/3
-    vary_K_L_lambda_results = step_2(dataset, classes_used, K, L, lam,
+    vary_K_L_lambda_results = step_2(dataset, classes_used, K, L_optimal, lam,
                                      print_train_losses, lam_step,
                                      D_optimal, C_crit=C_crit, D_crit=D_crit)
 
@@ -41,18 +41,19 @@ def run_algorithm_1():
 def step_1(dataset, classes_used, K, L, lam, print_train_losses, L_step, criteria=1):
     # init variables
     D = 999
-    D_rel_improvement = -999
+    D_rel_improvement = 999
     vary_L_results = [['L', 'D_results']]
     
-    while D_rel_improvement < -criteria:
-        print('\nTraining with K={}, L={}, lamda={}'.format(K, L, lam))
+    # stop when improvement is <1 (so negative improvement is also bad)
+    while D_rel_improvement > criteria:
+        print('\nTraining with K={}, L={}, lambda={}'.format(K, L, lam))
 
         train_results = train_explainer(dataset, classes_used, K, L, lam, print_train_losses)
         # retrieve average of last 500 training steps to compare with previous run
         D_new = np.mean(train_results['loss_nll'][-500:])
 
         # relative improvement of distance D
-        D_rel_improvement = (D_new - D) / D * 100
+        D_rel_improvement = -1*((D_new - D) / D * 100)
         print('Using L={}, the relative improvement of D_new: {:.2f}%'.format(L, D_rel_improvement))
 
         # save results
@@ -71,14 +72,14 @@ def step_1(dataset, classes_used, K, L, lam, print_train_losses, L_step, criteri
     
 def step_2(dataset, classes_used, K, L, lam, print_train_losses, lam_step, D_optimal, C_crit=1, D_crit=1):
     # init variables
-    C_rel_improvement = -999
+    C_rel_improvement = 999
     C = 999
     D_rel_diff = 999
     lam_use = 0
     vary_K_L_lambda_results = [['K', 'L', 'lambda', 'C', 'D', 'total_loss']]
     
     # change K,L,lambda until C plateaus
-    while C_rel_improvement < -C_crit:  # % improvement on distance
+    while C_rel_improvement < C_crit:  # % improvement on distance
         K += 1
         L -= 1
         print("\nNow training with K={} and L={}".format(K, L))
@@ -93,15 +94,15 @@ def step_2(dataset, classes_used, K, L, lam, print_train_losses, lam_step, D_opt
             
             # calculate relative difference of distance D
             D_new = np.mean(train_results['loss_nll'][-500:])
-            D_rel_diff = (D_new - D_optimal) / D_optimal * 100
+            D_rel_diff = ((D_new - D_optimal) / D_optimal * 100)
             print('Relative difference between D and D_optimal: {:.2f}%'.format(D_rel_diff))
         print("Optimal lambda={}".format(lam_use))
         
         # if C approaches optimal C, save causal effect
         C_new = np.mean(train_results['loss_ce'][-500:])
-        C_rel_improvement = (C_new - C) / C * 100
-        print('Relative improvement between C_new and C: {:.2f}%'.format(
-            D_rel_diff))
+        C_rel_improvement = -1*((C_new - C) / C * 100)
+        print('Relative improvement of causal effect: {:.2f}%'.format(
+            C_rel_improvement))
 
         # save all variables per step
         total_loss = np.mean(train_results['loss'][-500:])
