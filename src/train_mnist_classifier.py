@@ -4,6 +4,7 @@
     Trains MNIST/FMNIST classifier for use in figure-generating scripts.
 """
 
+from load_cifar import *
 from load_mnist import *
 import numpy as np
 import torch.nn as nn
@@ -14,14 +15,14 @@ import scipy.io as sio
 import os
 
 # --- options ---
-dataset = 'mnist'             # 'mnist' or 'fmnist'
-class_use = np.array([3,8])   # classes to select from dataset
+dataset = 'cifar'             # 'mnist' or 'fmnist'
+class_use = np.array([7,9])   # classes to select from dataset
 batch_size = 64               # training batch size
-c_dim = 1                     # number of channels in the input image
-lr = 0.1                      # sgd learning rate
-momentum = 0.5                # sgd momentum term
-img_size = 28                 # size of each image dimension
-gamma = 0.7                   # adam momentum term
+c_dim = 3                     # number of channels in the input image
+lr = 0.0005                      # sgd learning rate
+momentum = 0.8                # sgd momentum term
+img_size = 32                 # size of each image dimension
+gamma = 0.999                   # adam momentum term
 epochs = 50                   # number of training epochs
 save_folder_root = './pretrained_models'
 
@@ -44,6 +45,10 @@ elif dataset == 'fmnist':
     trX, trY, tridx = load_fashion_mnist_classSelect('train',class_use,newClass)
     vaX, vaY, vaidx = load_fashion_mnist_classSelect('val',class_use,newClass)
     teX, teY, teidx = load_fashion_mnist_classSelect('test',class_use,newClass)
+elif dataset == 'cifar':
+    trX, trY, tridx = load_cifar_classSelect('train', class_use, newClass)
+    vaX, vaY, vaidx = load_cifar_classSelect('val', class_use, newClass)
+    teX, teY, teidx = load_cifar_classSelect('test', class_use, newClass)
 else:
     print('dataset must be ''mnist'' or ''fmnist''!')
 
@@ -54,7 +59,7 @@ batch_idxs_val = len(vaX) // test_size
 ce_loss = nn.CrossEntropyLoss()
 #
 from models.CNN_classifier import CNN
-classifier = CNN(y_dim).to(device)
+classifier = CNN(y_dim, c_dim).to(device)
 optimizer = torch.optim.SGD(classifier.parameters(), lr=lr, momentum=momentum)
 scheduler = StepLR(optimizer, step_size=1, gamma=gamma)
 #

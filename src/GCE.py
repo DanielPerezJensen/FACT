@@ -10,6 +10,7 @@ import os
 from util import *
 from load_mnist import *
 from torch.utils.tensorboard import SummaryWriter
+import matplotlib.pyplot as plt
 
 class GenerativeCausalExplainer:
 
@@ -124,6 +125,13 @@ class GenerativeCausalExplainer:
             Xbatch = torch.from_numpy(X[randIdx]).float().permute(0,3,1,2).to(self.device)
             z, mu, logvar = self.encoder(Xbatch)
             Xhat = self.decoder(z)
+            if k % 500 == 0:
+                f, axs = plt.subplots(1, 2)
+                axs[0].imshow(np.int_(Xhat[0].cpu().permute(1, 2, 0).detach().numpy() * 255), cmap='gray')
+                axs[0].axis('off')
+                axs[1].imshow(np.int_(Xbatch[0].cpu().permute(1, 2, 0).detach().numpy() * 255), cmap='gray')
+                axs[1].axis('off')
+                plt.show()
             nll, nll_mse, nll_kld = loss_functions.VAE_LL_loss(Xbatch, Xhat, logvar, mu)
 
             # compute causal effect
@@ -209,7 +217,7 @@ class GenerativeCausalExplainer:
                     ztilde = z.copy()
                     ztilde[latent_dim] += z_sweep
                     xhat = self.decoder(torch.unsqueeze(torch.from_numpy(ztilde),0).to(self.device))
-                    yhat = np.argmax(self.classifier(xhat)[0].detach().cpu().numpy())
+                    yhat = np.argmax(self.classifier(xhat*255)[0].detach().cpu().numpy())
                     img = xhat.permute(0,2,3,1).detach().cpu().numpy()
                     Xhats[isamp,latent_dim,iz,:,:,:] = img
                     yhats[isamp,latent_dim,iz] = yhat

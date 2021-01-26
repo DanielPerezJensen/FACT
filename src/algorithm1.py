@@ -3,8 +3,8 @@ import numpy as np
 
 def run_algorithm_1():
     # dataset params todo: change when needed
-    dataset = 'mnist'  # 'fmnist'
-    classes_used = 38  # 034
+    dataset = 'cifar'  # 'fmnist'
+    classes_used = 79  # 034
     output_folder = 'outputs/'
 
     # print training losses per step
@@ -24,10 +24,10 @@ def run_algorithm_1():
     D_crit = 1
     
     ## STEP 1
-    L, D_optimal, vary_L_results = step_1(dataset, classes_used, K, L, lam,
+    D_optimal, L, vary_L_results = step_1(dataset, classes_used, K, L, lam,
                                           print_train_losses, L_step,
                                           criteria=criteria)
-    D_optimal=999
+
     ## STEP 2/3
     vary_K_L_lambda_results = step_2(dataset, classes_used, K, L, lam,
                                      print_train_losses, lam_step,
@@ -42,9 +42,9 @@ def run_algorithm_1():
 def step_1(dataset, classes_used, K, L, lam, print_train_losses, L_step, criteria=1):
     # init variables
     D = 999
-    D_rel_improvement = 999
+    D_rel_improvement = -999
     vary_L_results = ['L', 'D_results']
-    
+
     while D_rel_improvement < -criteria:
         train_results = train_explainer(dataset, classes_used, K, L, lam, print_train_losses)
         # retrieve average of last 500 training steps to compare with previous run
@@ -70,12 +70,12 @@ def step_1(dataset, classes_used, K, L, lam, print_train_losses, L_step, criteri
     
 def step_2(dataset, classes_used, K, L, lam, print_train_losses, lam_step, D_optimal, C_crit=1, D_crit=1):
     # init variables
-    C_rel_improvement = 999
+    C_rel_improvement = -999
     C = 999
     D_rel_diff = 999
     lam_use = 0
     vary_K_L_lambda_results = ['K', 'L', 'lambda', 'C', 'D', 'total_loss']
-    
+
     # change K,L,lambda until C plateaus
     while C_rel_improvement < -C_crit:  # % improvement on distance
         K += 1
@@ -83,10 +83,8 @@ def step_2(dataset, classes_used, K, L, lam, print_train_losses, lam_step, D_opt
         print("Now training with K={} and L={}".format(K, L))
         
         while D_rel_diff > D_crit:
-            #
             lam_use = round(lam_use + lam_step, 2)
             print("Training with lambda={}".format(lam_use))
-            
             train_results = train_explainer(dataset, classes_used, K, L,
                                             lam_use, print_train_losses)
             

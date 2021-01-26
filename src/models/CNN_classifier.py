@@ -2,9 +2,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 class CNN(nn.Module):
-   
-    def __init__(self, y_dim):
+
+    def __init__(self, y_dim, c_dim):
         """
         Initialize classifier
 
@@ -12,20 +13,20 @@ class CNN(nn.Module):
         - y_dim : number of classes
         """
         super(CNN, self).__init__()
-        self.conv1 = nn.Conv2d(1, 32, 3, 1)
+        self.conv1 = nn.Conv2d(c_dim, 32, 3, 1)
         self.conv2 = nn.Conv2d(32, 64, 3, 1)
         self.dropout1 = nn.Dropout2d(0.25)
         self.dropout2 = nn.Dropout2d(0.5)
-        self.fc1 = nn.Linear(9216, 128)
+        self.fc1 = nn.Linear(12544, 128)
         self.fc2 = nn.Linear(128, y_dim)
-        
+
     def forward(self, x):
         """
         Perform classification using the CNN classifier
-        
+
         Inputs:
         - x : input data sample
-        
+
         Outputs:
         - out: unnormalized output
         - prob_out: probability output
@@ -39,5 +40,5 @@ class CNN(nn.Module):
         x = self.dropout2(x)
         out = self.fc2(x)
         prob_out = F.softmax(out)
-        
+
         return prob_out, out

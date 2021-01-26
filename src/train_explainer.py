@@ -14,6 +14,7 @@ import torch
 import util
 import plotting
 from GCE import GenerativeCausalExplainer
+from load_cifar import *
 
 
 def train_explainer(dataset, classes_used, K, L, lam, print_train_losses=True):
@@ -23,7 +24,7 @@ def train_explainer(dataset, classes_used, K, L, lam, print_train_losses=True):
     dataset_name_full = dataset + '_' + str(classes_used)
     
     # classifier
-    classifier_path = 'data/pretrained_models/{}_classifier'.format(dataset_name_full)
+    classifier_path = './pretrained_models/{}_classifier'.format(dataset_name_full)
 
     # GCE params
     randseed = 0
@@ -32,9 +33,9 @@ def train_explainer(dataset, classes_used, K, L, lam, print_train_losses=True):
     save_gce = True  # save/overwrite pretrained explanatory VAE at gce_path
     
     # other train params
-    train_steps = 2 #8000
+    train_steps = 2000 #8000
     Nalpha = 25
-    Nbeta = 100
+    Nbeta = 70
     batch_size = 64
     lr = 5e-4
     
@@ -47,27 +48,34 @@ def train_explainer(dataset, classes_used, K, L, lam, print_train_losses=True):
 
     # --- load data ---
     from load_mnist import load_mnist_classSelect, load_fashion_mnist_classSelect
+
     if dataset == 'mnist':
         fn = load_mnist_classSelect
     elif dataset == 'fmnist':
         fn = load_fashion_mnist_classSelect
+    elif dataset == 'cifar':
+        fn = load_cifar_classSelect
     else:
         print('dataset not correctly specified')
         
     X, Y, tridx = fn('train', data_classes_lst, ylabels)
     vaX, vaY, vaidx = fn('val', data_classes_lst, ylabels)
+
+    if dataset == "cifar":
+        X, vaX = X / 255, vaX / 255
+
     ntrain, nrow, ncol, c_dim = X.shape
     x_dim = nrow*ncol
-    
+
     # --- load classifier ---
     from models.CNN_classifier import CNN
-    classifier = CNN(len(data_classes_lst)).to(device)
+    classifier = CNN(len(data_classes_lst), c_dim).to(device)
     checkpoint = torch.load('%s/model.pt' % classifier_path, map_location=device)
     classifier.load_state_dict(checkpoint['model_state_dict_classifier'])
     
     
     # --- train/load GCE ---
-    from models.CVAE import Decoder, Encoder
+    from models.CVAEImageNet import Decoder, Encoder
     if retrain_gce:
         encoder = Encoder(K+L, c_dim, x_dim).to(device)
         decoder = Decoder(K+L, c_dim, x_dim).to(device)
@@ -116,8 +124,8 @@ def train_explainer(dataset, classes_used, K, L, lam, print_train_losses=True):
     samples_per_class = math.ceil(nr_samples_fig / nr_labels)
     for i in range(nr_labels):
         samples_per_class = math.ceil((nr_samples_fig - i * samples_per_class) / (nr_labels - i))
-        sample_ind = np.concatenate([sample_ind, np.where(vaY == i)[0][:samples_per_class]])
-        
+        sample_ind = np.int_(np.concatenate([sample_ind, np.where(vaY == i)[0][:samples_per_class]]))
+
     x = torch.from_numpy(vaX[sample_ind])
     zs_sweep = [-3., -2., -1., 0., 1., 2., 3.]
     Xhats, yhats = gce.explain(x, zs_sweep)
@@ -130,9 +138,9 @@ def train_explainer(dataset, classes_used, K, L, lam, print_train_losses=True):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', default='mnist', type=str,
+    parser.add_argument('--dataset', default='cifar', type=str,
                         help='Name of dataset')
-    parser.add_argument('--classes_used', default=38, type=str,
+    parser.add_argument('--classes_used', default=79, type=str,
                         help='classes of dataset that are used')
     parser.add_argument('--K', default=1, type=int,
                         help='Number of causal factors')
