@@ -20,6 +20,7 @@ import datetime
 # User-made scripts
 from models import classifiers
 
+from src.models import CNN_classifier
 from src.load_mnist import *
 from src.mnist_reader import *
 
@@ -80,6 +81,8 @@ def main():
         classifier = classifiers.ResNetDerivative(num_classes=y_dim).to(device)
     elif model_name.lower() == "densenet":
         classifier = classifiers.DenseNetDerivative(num_classes=y_dim).to(device)
+    elif model_name.lower() == "base":
+        classifier = CNN_classifier.CNN(y_dim).to(device)
     else:
         raise ValueError("Invalid model_name, options=['InceptionNet', 'ResNet', 'DenseNet']")
 
