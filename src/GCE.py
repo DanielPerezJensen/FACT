@@ -158,9 +158,9 @@ class GenerativeCausalExplainer:
             self._writer.add_scalar('distance', nll.item(), k)
             self._writer.add_scalar('total_loss', loss.item(), k)
 
-            if self.params['debug_print']:
+            if self.params['debug_print'] and k % 100 == 0:
                 print("[Step %d/%d] time: %4.2f  [CE: %g] [D: %g] [total loss: %g]" % \
-                      (k+1, steps, time.time() - start_time, debug['loss_ce'][k],
+                      (k, steps, time.time() - start_time, debug['loss_ce'][k],
                       nll, debug['loss'][k]))
             if self.params['save_model_params'] and (k % 1000 == 0 or k == steps-1):
                 torch.save({
