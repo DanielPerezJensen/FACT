@@ -10,12 +10,13 @@ import scipy.io as sio
 import os
 import torch
 
-# Import user defined librariers
+# Import user defined libraries
 from models import classifiers
 from src.models.CVAE import Decoder, Encoder
 
 import src.util as util
 import src.plotting as plotting
+from src.models import CNN_classifier
 from src.GCE import GenerativeCausalExplainer
 from src.load_mnist import *
 
@@ -82,6 +83,8 @@ def main():
         classifier = classifiers.ResNetDerivative(num_classes=y_dim).to(device)
     elif model_name.lower() == "densenet":
         classifier = classifiers.DenseNetDerivative(num_classes=y_dim).to(device)
+    elif model_name.lower() == "base":
+        classifier = CNN_classifier.CNN(y_dim).to(device)
 
     # Load previously trained classifier
     print(save_folder_root + args.model_file)
@@ -106,6 +109,12 @@ def main():
                               lam=lam,
                               batch_size=batch_size,
                               lr=lr)
+        torch.save({
+            "model_state_dict_classifier": gce.classifier.state_dict(),
+            "model_state_dict_encoder": gce.encoder.state_dict(),
+            "model_state_dict_decoder": gce.decoder.state_dict(),
+            "step": train_steps
+        }, os.path.join(gce_path, 'model.pt'))
 
     # Continue training a partly trained model
     else:
@@ -130,17 +139,17 @@ def main():
                                   batch_size=batch_size,
                                   lr=lr)
 
+            os.makedirs(gce_path, exist_ok=True)
+
+            torch.save({
+                "model_state_dict_classifier": gce.classifier.state_dict(),
+                "model_state_dict_encoder": gce.encoder.state_dict(),
+                "model_state_dict_decoder": gce.decoder.state_dict(),
+                "step": train_steps + check
+            }, os.path.join(gce_path, 'model.pt'))
+
         else:
             raise ValueError(f"Not continuing training previous model since {checkpoint['step']} >= {train_steps}")
-
-    os.makedirs(gce_path, exist_ok=True)
-
-    torch.save({
-        "model_state_dict_classifier": gce.classifier.state_dict(),
-        "model_state_dict_encoder": gce.encoder.state_dict(),
-        "model_state_dict_decoder": gce.decoder.state_dict(),
-        "step": train_steps
-    }, os.path.join(gce_path, 'model.pt'))
 
 
 if __name__ == "__main__":
