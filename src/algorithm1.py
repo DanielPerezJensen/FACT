@@ -1,5 +1,6 @@
 from train_explainer import train_explainer
 import numpy as np
+import sys
 
 
 def run_algorithm_1():
@@ -104,7 +105,7 @@ def step_2(dataset, classes_used, K, L, lam, print_train_losses, lam_step,
             D_new = np.mean(train_results['loss_nll'][-500:])
             D_rel_diff = ((D_new - D_optimal) / D_optimal * 100)
             print('D_new={}, D={}'.format(D_new, D_optimal))
-            print('D is now {:.2f}% worse than D_optimal: '.format(D_rel_diff))
+            print('D is still {:.2f}% worse than D_optimal: '.format(D_rel_diff))
         print("Optimal lambda={}".format(lam_use))
         
         # if C approaches optimal C, save causal effect
@@ -123,6 +124,11 @@ def step_2(dataset, classes_used, K, L, lam, print_train_losses, lam_step,
         C = C_new
         D_rel_diff = 999
         lam_use = 0
+        
+        if L == 0:
+            print('C did not reach plateau, and L is 0')
+            return vary_K_L_lambda_results
+            
     
     return vary_K_L_lambda_results
 
