@@ -104,7 +104,7 @@ def step_2(dataset, classes_used, K, L, lam, print_train_losses, lam_step,
             # calculate relative difference of distance D
             D_new = np.mean(train_results['loss_nll'][-500:])
             D_rel_diff = ((D_new - D_optimal) / D_optimal * 100)
-            print('D_new={}, D={}'.format(D_new, D_optimal))
+            print('D_new={}, D_optimal={}'.format(D_new, D_optimal))
             print('D is still {:.2f}% worse than D_optimal'.format(D_rel_diff))
         print("Optimal lambda={}".format(lam_use))
         
