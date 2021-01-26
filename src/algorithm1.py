@@ -71,7 +71,7 @@ def step_1(dataset, classes_used, K, L, lam, print_train_losses, L_step,
         D = D_new
     
     # need L from before last cycle
-    L_optimal = L - 2 * L_step
+    L_optimal = L - L_step
     print('Optimal L={}'.format(L_optimal))
     
     # return optimal D and L before plateau is reached
@@ -105,7 +105,7 @@ def step_2(dataset, classes_used, K, L, lam, print_train_losses, lam_step,
             D_new = np.mean(train_results['loss_nll'][-500:])
             D_rel_diff = ((D_new - D_optimal) / D_optimal * 100)
             print('D_new={}, D={}'.format(D_new, D_optimal))
-            print('D is still {:.2f}% worse than D_optimal: '.format(D_rel_diff))
+            print('D is still {:.2f}% worse than D_optimal'.format(D_rel_diff))
         print("Optimal lambda={}".format(lam_use))
         
         # if C approaches optimal C, save causal effect
