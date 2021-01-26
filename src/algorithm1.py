@@ -127,7 +127,7 @@ def step_2(dataset, classes_used, K, L, lam, print_train_losses, lam_step,
 
         # stop execution when L reached 0
         if L == 0:
-            print('C did not reach plateau, and L is 0')
+            print('C did not reach plateau, and L is 0. \n Set C_crit higher, or do more training steps')
             return vary_K_L_lambda_results
             
     
