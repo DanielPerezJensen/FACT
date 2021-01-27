@@ -13,11 +13,13 @@ import torch
 # Import user defined librariers
 from models import classifiers
 from src.models.CVAE import Decoder, Encoder
-
+from src.models import CNN_classifier
 import src.util as util
 import src.plotting as plotting
 from src.GCE import GenerativeCausalExplainer
 from src.load_mnist import *
+
+from torchsummary import summary
 
 
 def main():
@@ -51,6 +53,12 @@ def main():
         classifier = classifiers.ResNetDerivative(num_classes=y_dim).to(device)
     elif model_name.lower() == "densenet":
         classifier = classifiers.DenseNetDerivative(num_classes=y_dim).to(device)
+    elif model_name.lower() == "base":
+        classifier = CNN_classifier.CNN(y_dim).to(device)
+
+    # Print information about the classifier
+    print(model_name)
+    print(summary(classifier, (1, 28, 28)))
 
     encoder = Encoder(K+L, c_dim, x_dim).to(device)
     decoder = Decoder(K+L, c_dim, x_dim).to(device)
@@ -69,7 +77,7 @@ def main():
     traininfo = gce.train(X, K, L,
                           steps=1,
                           Nalpha=15,
-                          Nbeta=50,
+                          Nbeta=40,
                           lam=0,
                           batch_size=64,
                           lr=0)
