@@ -170,7 +170,7 @@ class GenerativeCausalExplainer:
             datestamp = ''.join(re.findall(r'\d+', str(datetime.datetime.now())[:10]))
             timestamp = ''.join(re.findall(r'\d+', str(datetime.datetime.now())[11:19]))
             matfilename = 'results_' + datestamp + '_' + timestamp + '.mat'
-            # sio.savemat(self.params["save_dir"] + matfilename, {'params' : train_params, 'data' : debug})
+            sio.savemat(self.params["save_dir"] + matfilename, {'params' : self.train_params, 'data' : debug})
             if self.params['debug_print']:
                 print('Finished saving data to ' + matfilename)
         return debug

@@ -100,7 +100,7 @@ def main():
         encoder.apply(util.weights_init_normal)
         decoder.apply(util.weights_init_normal)
         gce = GenerativeCausalExplainer(classifier, decoder, encoder, device,
-                                        save_output=True, save_dir=gce_path)
+                                        save_output=True, save_dir=gce_path + "/")
 
         traininfo = gce.train(X, K, L,
                               steps=train_steps,
@@ -122,7 +122,7 @@ def main():
         decoder = Decoder(K+L, c_dim, x_dim).to(device)
         # Load GCE from stored model
         gce = GenerativeCausalExplainer(classifier, decoder, encoder, device,
-                                        save_output=True, save_dir=gce_path)
+                                        save_output=True, save_dir=gce_path + "/")
         checkpoint = torch.load(os.path.join(gce_path, 'model.pt'), map_location=device)
 
         gce.classifier.load_state_dict(checkpoint["model_state_dict_classifier"])
@@ -145,7 +145,7 @@ def main():
                 "model_state_dict_classifier": gce.classifier.state_dict(),
                 "model_state_dict_encoder": gce.encoder.state_dict(),
                 "model_state_dict_decoder": gce.decoder.state_dict(),
-                "step": train_steps + check
+                "step": train_steps + checkpoint["step"]
             }, os.path.join(gce_path, 'model.pt'))
 
         else:
