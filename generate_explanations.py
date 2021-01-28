@@ -5,6 +5,7 @@ much like in figure 3 of the original paper.
 
 # import standard libraries
 import argparse
+import math
 import numpy as np
 import scipy.io as sio
 import os
@@ -95,8 +96,16 @@ def generate_explanation(model_file):
     print(Is[K:])
 
     # --- generate explanation and create figure ---
-    sample_ind = np.concatenate((np.where(vaY == 0)[0][:4],
-                                 np.where(vaY == 1)[0][:4]))
+    nr_labels = len(data_classes)
+    nr_samples_per_fig = 8
+    sample_ind = np.empty(0, dtype=int)
+
+    # retrieve samples from each class
+    samples_per_class = math.ceil(nr_samples_per_fig / nr_labels)
+    for i in range(nr_labels):
+        samples_per_class = math.ceil((nr_samples_per_fig - i * samples_per_class) / (nr_labels - i))
+        sample_ind = np.concatenate([sample_ind, np.where(vaY == i)[0][:samples_per_class]])
+    
     x = torch.from_numpy(vaX[sample_ind])
     zs_sweep = [-3., -2., -1., 0., 1., 2., 3.]
     Xhats, yhats = gce.explain(x, zs_sweep)
