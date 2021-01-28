@@ -1,45 +1,47 @@
-from train_GCE import train_GCE
+import argparse
 import numpy as np
 import sys
 import os
 
+from train_GCE import train_GCE
 
-def run_algorithm_1():
-    # dataset params todo: change when needed
-    dataset = 'fmnist'  # 'fmnist'
-    classes_used = '034'  # 034
-    output_folder = 'reports/parameters/algorithm1/'
+
+def run_algorithm_1(args):
+    dataset = args.dataset
+    classes_used = args.classes_used
+    output_dir = args.output_dir
 
     # Starting values of training parameters
     K = 0
-    L = 5  # start number of latent variables
-    L_step = 1
+    L = args.L
     lam = 0.01
-    lam_step = 0.01
+    L_step = args.L_step
+    lam_step = args.lam_step
+    train_steps = args.train_steps
     
     # criteria step 1 (in percentual improvement between consecutive runs)
-    criteria = 1
+    criteria = args.step1_crit
     # criteria step 2
-    C_crit = 1
-    D_crit = 1
+    C_crit = args.step2_C_crit
+    D_crit = args.step2_D_crit
     
     ## STEP 1
     D_optimal, L_optimal, vary_L_results = step_1(dataset, classes_used, K, L,
-                                                  lam, L_step,
+                                                  lam, train_steps, L_step,
                                                   criteria=criteria)
     ## STEP 2/3
     vary_K_L_lambda_results = step_2(dataset, classes_used, K, L_optimal, lam,
-                                     lam_step, D_optimal, C_crit=C_crit, D_crit=D_crit)
+                                     train_steps, lam_step, D_optimal,
+                                     C_crit=C_crit, D_crit=D_crit)
     
     # print results
     print_results(vary_L_results, vary_K_L_lambda_results)
     # save results
     save_results(vary_L_results, vary_K_L_lambda_results, dataset, classes_used,
-                 output_folder)
+                 output_dir)
 
 
-def step_1(dataset, classes_used, K, L, lam, L_step,
-           criteria=1):
+def step_1(dataset, classes_used, K, L, lam, train_steps, L_step, criteria=1):
     # init variables
     D = 999
     D_rel_improvement = 999
@@ -49,7 +51,9 @@ def step_1(dataset, classes_used, K, L, lam, L_step,
     while D_rel_improvement > criteria:
         print('\nTraining with K={}, L={}, lambda={}'.format(K, L, lam))
     
-        train_results = train_GCE(f"base_{dataset}_{classes_used}_classifier", K, L, lam=lam, train_steps=5, retrain=True)
+        train_results = train_GCE(f"base_{dataset}_{classes_used}_classifier",
+                                  K, L, lam=lam, train_steps=train_steps,
+                                  retrain=True)
         # retrieve average of last 500 training steps to compare with previous run
         D_new = np.mean(train_results['loss_nll'][-500:])
         
@@ -73,8 +77,8 @@ def step_1(dataset, classes_used, K, L, lam, L_step,
     return D, L_optimal, vary_L_results
 
 
-def step_2(dataset, classes_used, K, L, lam, lam_step,
-           D_optimal, C_crit=1, D_crit=1):
+def step_2(dataset, classes_used, K, L, lam, train_steps,
+           lam_step, D_optimal, C_crit=1, D_crit=1):
     # init variables
     C_rel_improvement = 999
     C = -0.000000001
@@ -95,7 +99,7 @@ def step_2(dataset, classes_used, K, L, lam, lam_step,
             print("\nTraining with lambda={}".format(lam_use))
             
             train_results = train_GCE(f"base_{dataset}_{classes_used}_classifier",
-                                      K, L, lam=lam, train_steps=5, retrain=True)
+                                      K, L, lam=lam, train_steps=train_steps, retrain=True)
 
             
             # calculate relative difference of distance D
@@ -154,15 +158,42 @@ def print_results(vary_L_results, vary_K_L_lambda_results):
 
 
 def save_results(vary_L_results, vary_K_L_lambda_results, dataset, classes_used,
-                 output_folder):
-    save_dir = output_folder + '{}_{}_'.format(dataset, str(classes_used))
+                 output_dir):
+    save_dir = output_dir + '{}_{}_'.format(dataset, str(classes_used))
 
-    os.makedirs(output_folder, exist_ok=True)
+    os.makedirs(output_dir, exist_ok=True)
 
     np.save(save_dir + 'algorithm1_step_1_results.npy', vary_L_results)
     np.save(save_dir + 'algorithm1_step_2_results.npy', vary_K_L_lambda_results)
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--dataset", type=str, default='fmnist',
+                        help="Specification of used dataset")
+    parser.add_argument("--classes_used", type=str, default='034',
+                        help="Specification of classes used from dataset")
+    parser.add_argument("--L", type=int, default=1,
+                        help="Start value for L in step 1")
+    parser.add_argument("--train_steps", type=int, default=1,
+                        help="Specification of training steps for GCE.")
+    parser.add_argument("--L_step", type=int, default=1,
+                        help="Specification of incremental stepsize of L in step 1")
+    parser.add_argument("--lam_step", type=float, default=0.01,
+                        help="Specification of incremental stepsize of lambda in step 2")
+    parser.add_argument("--step1_crit", type=int, default=1,
+                        help="Criteria for D plateauing in step 1, "
+                             "stops when relative change is lower than 'step1_crit'%")
+    parser.add_argument("--step2_C_crit", type=int, default=1,
+                        help="Criteria for C plateauing in step 2,"
+                             "stops when relative change is lower than 'step2_C_crit'%")
+    parser.add_argument("--step2_D_crit", type=int, default=5,
+                        help="Criteria for D approaching optimal D from step 1,"
+                             "stops when relative difference is lower than 'step2_D_crit'%")
+    parser.add_argument("--output_dir", type=str, default='reports/parameters/algorithm1/',
+                        help="Output directory")
+    args = parser.parse_args()
+
     # run the algorithm
-    run_algorithm_1()
+    run_algorithm_1(args)
