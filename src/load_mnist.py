@@ -1,6 +1,9 @@
 import os
 import numpy as np
 import scipy.io as sio
+import src.mnist_reader as mnist_reader
+
+
 
 def load_mnist_idx(data_type):
        data_dir = 'data/mnist/'
@@ -58,8 +61,7 @@ def load_mnist_classSelect(data_type,class_use,newClass):
     return X,Y,idx
 
 def load_fashion_mnist_idx(data_type):
-    import mnist_reader
-    data_dir = 'data/fmnist/'
+    data_dir = 'datasets/fmnist/'
     if data_type == "train":
         X, y = mnist_reader.load_mnist(data_dir, kind='train')
     elif data_type == "test" or data_type == "val":

@@ -4,8 +4,8 @@ import re
 import numpy as np
 import scipy.io as sio
 import torch
-import loss_functions
-import causaleffect
+import src.loss_functions as loss_functions
+import src.causaleffect as causaleffect
 import os
 from util import *
 from load_mnist import *
@@ -150,7 +150,7 @@ class GenerativeCausalExplainer:
                     self.ceparams, self.decoder, self.classifier, self.device)
             else:
                 print('Invalid causal objective!')
-            
+
             # compute gradient
             loss = use_ce*causalEffect + lam*nll
             loss.backward()
