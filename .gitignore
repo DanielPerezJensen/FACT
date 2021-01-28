@@ -132,11 +132,10 @@ dmypy.json
 bin/
 
 # exclude data from source control by default
-/data/external
-/data/interim
-/data/processed
-/data/raw
+/datasets
 
 # exclude external models from source control
 /src/datasets/
 /src/pretrained_models/
+/models/classifiers/
+/models/GCEs/

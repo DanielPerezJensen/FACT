@@ -7,7 +7,6 @@
 """
 import argparse
 import math
-import numpy as np
 import scipy.io as sio
 import os
 import torch

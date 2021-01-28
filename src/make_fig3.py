@@ -112,4 +112,4 @@ sample_ind = np.concatenate((np.where(vaY == 0)[0][:4],
 x = torch.from_numpy(vaX[sample_ind])
 zs_sweep = [-3., -2., -1., 0., 1., 2., 3.]
 Xhats, yhats = gce.explain(x, zs_sweep)
-plotting.plotExplanation(1.-Xhats, yhats, save_path='C:/Users/Dylan/Desktop/FACT/Figure3')
+plotting.plotExplanation(1. - Xhats, yhats, save_path='/Fig3CIFAR')
