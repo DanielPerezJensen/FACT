@@ -107,7 +107,7 @@ def load_fashion_mnist_classSelect(data_type,class_use,newClass):
     
 
 def load_svhn_idx(data_type):
-       data_dir = 'datasets/SVHN/'
+       data_dir = 'data/SVHN/'
        if data_type == "train":
            data = sio.loadmat(data_dir + 'train_32x32.mat')
            X = data['X'].astype(np.float)

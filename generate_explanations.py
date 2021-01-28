@@ -5,6 +5,7 @@ much like in figure 3 of the original paper.
 
 # import standard libraries
 import argparse
+import math
 import numpy as np
 import scipy.io as sio
 import os
@@ -22,11 +23,17 @@ from src.load_mnist import *
 from torchsummary import summary
 
 
-def main():
+def generate_explanation(model_file):
 
-    model_name = args.model_file.split("_")[0]
-    data = args.model_file.split("_")[1]
-    data_classes = np.array(list(args.model_file.split("_")[2]), dtype=int)
+    model_params = model_file.split("_")
+
+    model_name = model_params[0]
+    data = model_params[1]
+    data_classes = np.array(list(model_params[2]), dtype=int)
+
+    K = int(model_params[4][1:])
+    L = int(model_params[5][1:])
+    lam = model_params[6]
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -36,11 +43,9 @@ def main():
     if data.lower() == "mnist":
         X, Y, tridx = load_mnist_classSelect('train', data_classes, ylabels)
         vaX, vaY, vaidx = load_mnist_classSelect('val', data_classes, ylabels)
-        K, L = 1, 7
     elif data.lower() == "fmnist":
         X, Y, tridx = load_fashion_mnist_classSelect('train', data_classes, ylabels)
         vaX, vaY, vaidx = load_fashion_mnist_classSelect('val', data_classes, ylabels)
-        K, L = 2, 4
 
     ntrain, nrow, ncol, c_dim = X.shape
     x_dim = nrow * ncol
@@ -67,7 +72,7 @@ def main():
     gce = GenerativeCausalExplainer(classifier, decoder, encoder, device)
 
     # Load trained weights
-    checkpoint = torch.load(f"models/GCEs/{args.model_file}_gce/model.pt")
+    checkpoint = torch.load(f"models/GCEs/{model_file}/model.pt")
 
     gce.classifier.load_state_dict(checkpoint["model_state_dict_classifier"])
     gce.encoder.load_state_dict(checkpoint["model_state_dict_encoder"])
@@ -91,22 +96,34 @@ def main():
     print(Is[K:])
 
     # --- generate explanation and create figure ---
-    sample_ind = np.concatenate((np.where(vaY == 0)[0][:4],
-                                 np.where(vaY == 1)[0][:4]))
+    nr_labels = len(data_classes)
+    nr_samples_per_fig = 8
+    sample_ind = np.empty(0, dtype=int)
+
+    # retrieve samples from each class
+    samples_per_class = math.ceil(nr_samples_per_fig / nr_labels)
+    for i in range(nr_labels):
+        samples_per_class = math.ceil((nr_samples_per_fig - i * samples_per_class) / (nr_labels - i))
+        sample_ind = np.concatenate([sample_ind, np.where(vaY == i)[0][:samples_per_class]])
+    
     x = torch.from_numpy(vaX[sample_ind])
     zs_sweep = [-3., -2., -1., 0., 1., 2., 3.]
     Xhats, yhats = gce.explain(x, zs_sweep)
 
-    os.makedirs(f"reports/figures/GCEs/{model_name + '_' + data}", exist_ok=True)
-    plotting.plotExplanation(1.-Xhats, yhats, save_path=f'reports/figures/GCEs/{model_name + "_" + data}/{model_name}')
+    save_path = f"reports/figures/GCEs/{model_name}_{data}_K{K}_L{L}_{lam}"
+    os.makedirs(save_path, exist_ok=True)
+
+    plotting.plotExplanation(1.-Xhats, yhats, save_path=f'{save_path}/')
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--model_file", type=str, default="inceptionnet_mnist_38",
+    parser.add_argument("--model_file", type=str, default="inceptionnet_mnist_38_gce_K1_L7_lambda005",
                         help="Specification of what model we are using.")
 
     args = parser.parse_args()
 
-    main()
+    model_file = args.model_file
+
+    generate_explanation(model_file)

@@ -21,11 +21,13 @@ from src.GCE import GenerativeCausalExplainer
 from src.load_mnist import *
 
 
-def main():
+def train_GCE(model_file, K, L, train_steps=5000,
+              Nalpha=15, Nbeta=75, lam=0.05, batch_size=64,
+              lr=5e-4, seed=1, retrain=False):
 
     save_folder_root = "models/"
     # Gather params from model name
-    model_params = args.model_file.split("_")
+    model_params = model_file.split("_")
 
     if len(model_params) != 4:
         raise InputError("model_file must be in the format: <model_name>_<data_type>_<class_use>_classifier and must be located in models/classifiers/")
@@ -37,24 +39,13 @@ def main():
     # Create path of GCE from other model
     gce_path = os.path.join(save_folder_root, "GCEs",
                             model_params[0] + "_" + model_params[1]
-                            + "_" + model_params[2] + "_gce")
+                            + "_" + model_params[2] + "_gce" +
+                            "_K" + str(K) + "_L" + str(L) +
+                            "_lambda" + str(lam).replace(".", ""))
 
     # Continue training if model already exists
-    retrain = True
-    if os.path.exists(gce_path + "/model.pt"):
-        retrain = False
-
-    # Training Parameters
-    K = args.K
-    L = args.L
-    train_steps = args.train_steps
-    Nalpha = args.Nalpha
-    Nbeta = args.Nbeta
-    lam = args.lam
-    batch_size = args.batch_size
-    lr = args.lr
-
-    seed = args.seed
+    if not os.path.exists(gce_path + "/model.pt"):
+        retrain = True
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -87,13 +78,11 @@ def main():
         classifier = CNN_classifier.CNN(y_dim).to(device)
 
     # Load previously trained classifier
-    print(save_folder_root + args.model_file)
-    checkpoint = torch.load('%s/model.pt' % (save_folder_root + "/classifiers/" + args.model_file), map_location=device)
+    checkpoint = torch.load('%s/model.pt' % (save_folder_root + "/classifiers/" + model_file), map_location=device)
     classifier.load_state_dict(checkpoint['model_state_dict_classifier'])
 
     # Train a new model
     if retrain:
-
         # Declare GCE and it's needed variables
         encoder = Encoder(K+L, c_dim, x_dim).to(device)
         decoder = Decoder(K+L, c_dim, x_dim).to(device)
@@ -151,6 +140,8 @@ def main():
         else:
             raise ValueError(f"Not continuing training previous model since {checkpoint['step']} >= {train_steps}")
 
+    return traininfo
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -178,4 +169,16 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    main()
+    # Training Parameters
+    K = args.K
+    L = args.L
+    train_steps = args.train_steps
+    Nalpha = args.Nalpha
+    Nbeta = args.Nbeta
+    lam = args.lam
+    batch_size = args.batch_size
+    lr = args.lr
+
+    seed = args.seed
+
+    train_GCE(args.model_file, K, L, train_steps, Nalpha, Nbeta, lam, batch_size, lr, seed)

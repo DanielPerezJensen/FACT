@@ -7,8 +7,10 @@ import torch
 import src.loss_functions as loss_functions
 import src.causaleffect as causaleffect
 import os
+from torch.utils.tensorboard import SummaryWriter
 from src.util import *
 from src.load_mnist import *
+
 
 class GenerativeCausalExplainer:
 
@@ -17,14 +19,14 @@ class GenerativeCausalExplainer:
     :param decoder: decoder model
     :param encoder: encoder model
     :param device: pytorch device object
-    :param save_output: save model output when training
+    :param save_output: save model results when training
     :param save_dir: directory to save model outputs when training
     :param debug_print: print debug messages
     """
     def __init__(self, classifier, decoder, encoder, device,
-                 save_output = False,
-                 save_dir = None,
-                 debug_print = True):
+                 save_output=False,
+                 save_dir=None,
+                 debug_print=True):
 
         # initialize
         super(GenerativeCausalExplainer, self).__init__()
@@ -35,12 +37,13 @@ class GenerativeCausalExplainer:
         self.params = {'save_output' : save_output,
                        'save_dir'    : save_dir,
                        'debug_print' : debug_print}
-        if save_dir is not None and not os.path.exists(self.params['save_dir']):
+        if self.params['save_dir'] is not None and not os.path.exists(self.params['save_dir']):
             os.makedirs(self.params['save_dir'])
-        if self.params['debug_print']:
-            print("Parameters:")
-            print(self.params)
-
+        # if self.params['debug_print']:
+        #     print("Parameters:")
+        #     print(self.params)
+        if self.params['save_dir'] is not None:
+            self._writer = SummaryWriter(self.params['save_dir'] + "/runs", filename_suffix=os.path.split(self.params['save_dir'])[1])
 
     """
     :param X: training data (not necessarily same as classifier training data)
@@ -98,6 +101,7 @@ class GenerativeCausalExplainer:
         debug = {'loss'              : np.zeros((steps)),
                  'loss_ce'           : np.zeros((steps)),
                  'loss_nll'          : np.zeros((steps)),
+                 'loss_nll_lam'      : np.zeros((steps)),
                  'loss_nll_logdet'   : np.zeros((steps)),
                  'loss_nll_quadform' : np.zeros((steps)),
                  'loss_nll_mse'      : np.zeros((steps)),
@@ -145,36 +149,49 @@ class GenerativeCausalExplainer:
             # save debug info for this step
             debug['loss'][k] = loss.item()
             debug['loss_ce'][k] = causalEffect.item()
-            debug['loss_nll'][k] = (lam*nll).item()
+            debug['loss_nll'][k] = nll.item()
+            debug['loss_nll_lam'][k] = (lam*nll).item()
             debug['loss_nll_mse'][k] = (lam*nll_mse).item()
             debug['loss_nll_kld'][k] = (lam*nll_kld).item()
+
+            if self.params['save_dir'] is not None:
+                self._writer.add_scalar('causaleffect', causalEffect.item(), k)
+                self._writer.add_scalar('distance', nll.item(), k)
+                self._writer.add_scalar('total_loss', loss.item(), k)
+
             if self.params['debug_print']:
                 print("[Step %d/%d] time: %4.2f  [CE: %g] [ML: %g] [loss: %g]" % \
                       (k+1, steps, time.time() - start_time, debug['loss_ce'][k],
-                      debug['loss_nll'][k], debug['loss'][k]))
+                       debug['loss_nll'][k], debug['loss'][k]))
+
             if self.params['save_output'] and k % 100 == 0:
                 torch.save({
                     'step': k,
-                    'model_state_dict_classifier' : self.classifier.state_dict(),
-                    'model_state_dict_encoder' : self.encoder.state_dict(),
-                    'model_state_dict_decoder' : self.decoder.state_dict(),
-                    'optimizer_state_dict' : self.opt.state_dict(),
-                    'loss' : loss,
+                    'model_state_dict_classifier': self.classifier.state_dict(),
+                    'model_state_dict_encoder': self.encoder.state_dict(),
+                    'model_state_dict_decoder': self.decoder.state_dict(),
+                    'optimizer_state_dict': self.opt.state_dict(),
+                    'loss': loss,
                     }, '%s/model.pt' % \
                     (self.params['save_dir']))
-        
+
+        if self.params['save_dir'] is not None:
+            self._writer.close()
         # save/return debug data from entire training run
         debug['Xbatch'] = Xbatch.detach().cpu().numpy()
         debug['Xhat'] = Xhat.detach().cpu().numpy()
         if self.params['save_output']:
             datestamp = ''.join(re.findall(r'\d+', str(datetime.datetime.now())[:10]))
             timestamp = ''.join(re.findall(r'\d+', str(datetime.datetime.now())[11:19]))
+
             matfilename = 'results_' + datestamp + '_' + timestamp + '.mat'
             sio.savemat(self.params["save_dir"] + matfilename, {'params' : self.train_params, 'data' : debug})
+
             if self.params['debug_print']:
-                print('Finished saving data to ' + matfilename)
+                print('Finished saving data to ' + self.params["save_dir"] + matfilename)
+
         return debug
-    
+
     """
     Generate explanation for input x.
     :param x: input to explain, torch(nsamp,nrows,ncols,nchans)
