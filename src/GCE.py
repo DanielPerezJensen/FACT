@@ -4,11 +4,11 @@ import re
 import numpy as np
 import scipy.io as sio
 import torch
-import loss_functions
-import causaleffect
+import src.loss_functions as loss_functions
+import src.causaleffect as causaleffect
 import os
-from util import *
-from load_mnist import *
+from src.util import *
+from src.load_mnist import *
 
 class GenerativeCausalExplainer:
 
@@ -136,7 +136,7 @@ class GenerativeCausalExplainer:
                     self.ceparams, self.decoder, self.classifier, self.device)
             else:
                 print('Invalid causal objective!')
-            
+
             # compute gradient
             loss = use_ce*causalEffect + lam*nll
             loss.backward()
@@ -152,7 +152,7 @@ class GenerativeCausalExplainer:
                 print("[Step %d/%d] time: %4.2f  [CE: %g] [ML: %g] [loss: %g]" % \
                       (k+1, steps, time.time() - start_time, debug['loss_ce'][k],
                       debug['loss_nll'][k], debug['loss'][k]))
-            if self.params['save_output'] and k % 1000 == 0:
+            if self.params['save_output'] and k % 100 == 0:
                 torch.save({
                     'step': k,
                     'model_state_dict_classifier' : self.classifier.state_dict(),
@@ -160,8 +160,8 @@ class GenerativeCausalExplainer:
                     'model_state_dict_decoder' : self.decoder.state_dict(),
                     'optimizer_state_dict' : self.opt.state_dict(),
                     'loss' : loss,
-                    }, '%s_batch_%d.pt' % \
-                    (self.params['save_dir'], self.params['batch_size']))
+                    }, '%s/model.pt' % \
+                    (self.params['save_dir']))
         
         # save/return debug data from entire training run
         debug['Xbatch'] = Xbatch.detach().cpu().numpy()
@@ -170,7 +170,7 @@ class GenerativeCausalExplainer:
             datestamp = ''.join(re.findall(r'\d+', str(datetime.datetime.now())[:10]))
             timestamp = ''.join(re.findall(r'\d+', str(datetime.datetime.now())[11:19]))
             matfilename = 'results_' + datestamp + '_' + timestamp + '.mat'
-            sio.savemat(save_dir + matfilename, {'params' : params, 'data' : debug})
+            sio.savemat(self.params["save_dir"] + matfilename, {'params' : self.train_params, 'data' : debug})
             if self.params['debug_print']:
                 print('Finished saving data to ' + matfilename)
         return debug
