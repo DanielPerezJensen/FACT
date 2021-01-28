@@ -33,7 +33,7 @@ def train_explainer(dataset, classes_used, K, L, lam, print_train_losses=True):
     save_gce = True  # save/overwrite pretrained explanatory VAE at gce_path
     
     # other train params
-    train_steps = 4000 #8000
+    train_steps = 3000 #8000
     Nalpha = 25
     Nbeta = 70
     batch_size = 64
@@ -140,7 +140,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', default='cifar', type=str,
                         help='Name of dataset')
-    parser.add_argument('--classes_used', default=79, type=str,
+    parser.add_argument('--classes_used', default=35, type=str,
                         help='classes of dataset that are used')
     parser.add_argument('--K', default=1, type=int,
                         help='Number of causal factors')

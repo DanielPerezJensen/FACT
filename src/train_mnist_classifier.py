@@ -16,14 +16,14 @@ import os
 
 # --- options ---
 dataset = 'cifar'             # 'mnist' or 'fmnist'
-class_use = np.array([7,9])   # classes to select from dataset
+class_use = np.array([3,5])   # classes to select from dataset
 batch_size = 64               # training batch size
 c_dim = 3                     # number of channels in the input image
 lr = 0.0005                      # sgd learning rate
-momentum = 0.8                # sgd momentum term
+momentum = 0.9                # sgd momentum term
 img_size = 32                 # size of each image dimension
 gamma = 0.999                   # adam momentum term
-epochs = 50                   # number of training epochs
+epochs = 100                   # number of training epochs
 save_folder_root = './pretrained_models'
 
 class_use_str = np.array2string(class_use)

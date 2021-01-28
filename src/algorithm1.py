@@ -5,7 +5,7 @@ import sys
 def run_algorithm_1():
     # dataset params todo: change when needed
     dataset = 'cifar'  # 'fmnist'
-    classes_used = 79  # 034
+    classes_used = 35  # 034
     output_folder = 'outputs/'
 
     # print training losses per step

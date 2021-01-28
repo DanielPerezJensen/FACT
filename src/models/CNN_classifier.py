@@ -14,11 +14,12 @@ class CNN(nn.Module):
         """
         super(CNN, self).__init__()
         self.conv1 = nn.Conv2d(c_dim, 32, 3, 1)
+        self.pool = nn.MaxPool2d(2,2)
         self.conv2 = nn.Conv2d(32, 64, 3, 1)
         self.dropout1 = nn.Dropout2d(0.25)
         self.dropout2 = nn.Dropout2d(0.5)
-        self.fc1 = nn.Linear(12544, 128)
-        self.fc2 = nn.Linear(128, y_dim)
+        self.fc1 = nn.Linear(2304, 512) #12544
+        self.fc2 = nn.Linear(512, y_dim)
 
     def forward(self, x):
         """
@@ -31,9 +32,9 @@ class CNN(nn.Module):
         - out: unnormalized output
         - prob_out: probability output
         """
-        x = F.relu(self.conv1(x))
-        x = F.relu(self.conv2(x))
-        x = F.max_pool2d(x, 2)
+        x = self.pool(F.relu(self.conv1(x)))
+        x = self.pool(F.relu(self.conv2(x)))
+        #x = F.max_pool2d(x, 2)
         x = self.dropout1(x)
         x = torch.flatten(x, 1)
         x = F.relu(self.fc1(x))
