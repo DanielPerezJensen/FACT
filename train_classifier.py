@@ -37,8 +37,6 @@ def main():
     epochs = args.epochs
     lr = args.lr
     momentum = args.momentum
-    c_dim = 1
-    img_size = 28
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -64,8 +62,16 @@ def main():
         trX, trY, tridx = load_fashion_mnist_classSelect('train', class_use, newClass)
         vaX, vaY, vaidx = load_fashion_mnist_classSelect('val', class_use, newClass)
         teX, teY, teidx = load_fashion_mnist_classSelect('test', class_use, newClass)
+    elif dataset == 'cifar':
+        from load_cifar import load_cifar_classSelect
+        trX, trY, _ = load_cifar_classSelect('train', class_use, newClass)
+        vaX, vaY, _ = load_cifar_classSelect('val', class_use, newClass)
+        trX, vaX = trX, vaX
     else:
-        print('dataset must be ''mnist'' or ''fmnist''!')
+        print('dataset must be ''cifar'' ''mnist'' or ''fmnist''!')
+
+    c_dim = trX.shape[-1]
+    img_size = trX.shape[1]
 
     # Number of batches per epoch
     batch_idxs = len(trX) // batch_size
@@ -82,7 +88,7 @@ def main():
     elif model_name.lower() == "densenet":
         classifier = classifiers.DenseNetDerivative(num_classes=y_dim).to(device)
     elif model_name.lower() == "base":
-        classifier = CNN_classifier.CNN(y_dim).to(device)
+        classifier = CNN_classifier.CNN(y_dim, c_dim, img_size).to(device)
     else:
         raise ValueError("Invalid model_name, options=['InceptionNet', 'ResNet', 'DenseNet']")
 
@@ -174,21 +180,21 @@ def main():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--model", type=str, default="InceptionNet",
+    parser.add_argument("--model", type=str, default="base",
                         help="Specification of model to be trained.")
-    parser.add_argument("--dataset", type=str, default="mnist",
+    parser.add_argument("--dataset", type=str, default="cifar",
                         help="Specification of dataset to be used.")
-    parser.add_argument("--class_use", type=int, default=[3, 8], nargs="+",
+    parser.add_argument("--class_use", type=int, default=[3, 5], nargs="+",
                         help="Specification of what classes to use" +
                              "To specify multiple, use \" \" to" +
                              "separate them. Example \"3 8\".")
     parser.add_argument("--batch_size", type=int, default=64,
                         help="Specification of batch size to be used.")
-    parser.add_argument("--epochs", type=int, default=10,
+    parser.add_argument("--epochs", type=int, default=50,
                         help="Specification of training epochs.")
-    parser.add_argument("--lr", type=float, default=0.1,
+    parser.add_argument("--lr", type=float, default=0.0005,
                         help="Specification of learning rate for SGD")
-    parser.add_argument("--momentum", type=float, default=0.5,
+    parser.add_argument("--momentum", type=float, default=0.9,
                         help="Specification of Momentum for SGD")
     parser.add_argument("--seed", type=int, default=1,
                         help="Specification of random seed of this run")

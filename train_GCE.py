@@ -62,6 +62,11 @@ def train_GCE(model_file, K, L, train_steps=5000,
     elif data.lower() == "fmnist":
         X, Y, tridx = load_fashion_mnist_classSelect('train', data_classes, ylabels)
         vaX, vaY, vaidx = load_fashion_mnist_classSelect('val', data_classes, ylabels)
+    elif data.lower() == 'cifar':
+        from load_cifar import load_cifar_classSelect
+        X, Y, _ = load_cifar_classSelect('train', data_classes, ylabels)
+        vaX, vaY, _ = load_cifar_classSelect('val', data_classes, ylabels)
+        X, vaX = X / 255, vaX / 255
 
     ntrain, nrow, ncol, c_dim = X.shape
     x_dim = nrow * ncol
@@ -75,7 +80,7 @@ def train_GCE(model_file, K, L, train_steps=5000,
     elif model_name.lower() == "densenet":
         classifier = classifiers.DenseNetDerivative(num_classes=y_dim).to(device)
     elif model_name.lower() == "base":
-        classifier = CNN_classifier.CNN(y_dim).to(device)
+        classifier = CNN_classifier.CNN(y_dim, c_dim, img_size=nrow).to(device)
 
     # Load previously trained classifier
     checkpoint = torch.load('%s/model.pt' % (save_folder_root + "/classifiers/" + model_file), map_location=device)
@@ -146,17 +151,17 @@ def train_GCE(model_file, K, L, train_steps=5000,
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--model_file", type=str, default="inceptionnet_mnist_38_classifier",
+    parser.add_argument("--model_file", type=str, default="base_cifar_35_classifier",
                         help="Specification of path to model to be explained by GCE.")
     parser.add_argument("--batch_size", type=int, default=64,
                         help="Specification of batch size to be used.")
-    parser.add_argument("--train_steps", type=int, default=5000,
+    parser.add_argument("--train_steps", type=int, default=3000,
                         help="Specification of training steps for GCE.")
     parser.add_argument("--lr", type=float, default=5e-4,
                         help="Specification of learning rate")
     parser.add_argument("--K", type=int, default=1,
                         help="Specification of number of causal Factors")
-    parser.add_argument("--L", type=int, default=7,
+    parser.add_argument("--L", type=int, default=16,
                         help="Specification of number of non-causal Factors")
     parser.add_argument("--lam", type=float, default=0.05,
                         help="Specification of lambda parameter")

@@ -2,7 +2,6 @@ import argparse
 import numpy as np
 import sys
 import os
-
 from train_GCE import train_GCE
 
 
@@ -50,10 +49,10 @@ def step_1(dataset, classes_used, K, L, lam, train_steps, L_step, criteria=1):
     # stop when improvement is <1 (so negative improvement is also bad)
     while D_rel_improvement > criteria:
         print('\nTraining with K={}, L={}, lambda={}'.format(K, L, lam))
-    
         train_results = train_GCE(f"base_{dataset}_{classes_used}_classifier",
                                   K, L, lam=lam, train_steps=train_steps,
                                   retrain=True)
+
         # retrieve average of last 500 training steps to compare with previous run
         D_new = np.mean(train_results['loss_nll'][-500:])
         
@@ -86,7 +85,7 @@ def step_2(dataset, classes_used, K, L, lam, train_steps,
     D_rel_diff_old = 999
     lam_use = 0
     vary_K_L_lambda_results = [['K', 'L', 'lambda', 'C', 'D', 'total_loss']]
-    
+
     # change K,L,lambda until C plateaus
     while C_rel_improvement > C_crit:  # % improvement on distance
         K += 1
@@ -94,13 +93,11 @@ def step_2(dataset, classes_used, K, L, lam, train_steps,
         print("\nNow training with K={} and L={}".format(K, L))
         
         while D_rel_diff > D_crit:
-            #
             lam_use = round(lam_use + lam_step, 2)
             print("\nTraining with lambda={}".format(lam_use))
-            
+
             train_results = train_GCE(f"base_{dataset}_{classes_used}_classifier",
                                       K, L, lam=lam, train_steps=train_steps, retrain=True)
-
             
             # calculate relative difference of distance D
             D_new = np.mean(train_results['loss_nll'][-500:])
