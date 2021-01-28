@@ -137,5 +137,3 @@ bin/
 # exclude external models from source control
 /src/datasets/
 /src/pretrained_models/
-/models/classifiers/
-/models/GCEs/
