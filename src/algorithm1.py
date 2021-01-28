@@ -82,7 +82,7 @@ def step_2(dataset, classes_used, K, L, lam, print_train_losses, lam_step,
            D_optimal, C_crit=1, D_crit=1):
     # init variables
     C_rel_improvement = 999
-    C = -0.0001
+    C = -0.000000001
     D_rel_diff = 999
     D_rel_diff_old = 999
     lam_use = 0
@@ -132,6 +132,7 @@ def step_2(dataset, classes_used, K, L, lam, print_train_losses, lam_step,
         # init for next cycle
         C = C_new
         D_rel_diff = 999
+        D_rel_diff_old = 999
         lam_use = 0
 
         # stop execution when L reached 0
