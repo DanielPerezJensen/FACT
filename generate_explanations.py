@@ -32,6 +32,7 @@ def generate_explanation(model_file):
 
     K = int(model_params[4][1:])
     L = int(model_params[5][1:])
+    lam = model_params[6]
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -100,8 +101,10 @@ def generate_explanation(model_file):
     zs_sweep = [-3., -2., -1., 0., 1., 2., 3.]
     Xhats, yhats = gce.explain(x, zs_sweep)
 
-    os.makedirs(f"reports/figures/GCEs/{model_name + '_' + data}", exist_ok=True)
-    plotting.plotExplanation(1.-Xhats, yhats, save_path=f'reports/figures/GCEs/{model_name + "_" + data}/{model_name}')
+    save_path = f"reports/figures/GCEs/{model_name}_{data}_K{K}_L{L}_{lam}"
+    os.makedirs(save_path, exist_ok=True)
+
+    plotting.plotExplanation(1.-Xhats, yhats, save_path=f'{save_path}/')
 
 
 if __name__ == "__main__":
