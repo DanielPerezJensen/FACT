@@ -78,13 +78,11 @@ def train_GCE(model_file, K, L, train_steps=5000,
         classifier = CNN_classifier.CNN(y_dim).to(device)
 
     # Load previously trained classifier
-    print(save_folder_root + model_file)
     checkpoint = torch.load('%s/model.pt' % (save_folder_root + "/classifiers/" + model_file), map_location=device)
     classifier.load_state_dict(checkpoint['model_state_dict_classifier'])
 
     # Train a new model
     if retrain:
-
         # Declare GCE and it's needed variables
         encoder = Encoder(K+L, c_dim, x_dim).to(device)
         decoder = Decoder(K+L, c_dim, x_dim).to(device)

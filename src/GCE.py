@@ -39,7 +39,6 @@ class GenerativeCausalExplainer:
                        'debug_print' : debug_print}
         if self.params['save_dir'] is not None and not os.path.exists(self.params['save_dir']):
             os.makedirs(self.params['save_dir'])
-            print('Made dir: {}'.format(self.params['save_dir']))
         # if self.params['debug_print']:
         #     print("Parameters:")
         #     print(self.params)
@@ -189,7 +188,7 @@ class GenerativeCausalExplainer:
             sio.savemat(self.params["save_dir"] + matfilename, {'params' : self.train_params, 'data' : debug})
 
             if self.params['debug_print']:
-                print('Finished saving data to ' + matfilename)
+                print('Finished saving data to ' + self.params["save_dir"] + matfilename)
 
         return debug
 
