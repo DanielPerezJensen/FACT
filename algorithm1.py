@@ -176,7 +176,7 @@ if __name__ == '__main__':
                         help="Specification of classes used from dataset")
     parser.add_argument("--L", type=int, default=1,
                         help="Start value for L in step 1")
-    parser.add_argument("--train_steps", type=int, default=1,
+    parser.add_argument("--train_steps", type=int, default=3000,
                         help="Specification of training steps for GCE.")
     parser.add_argument("--L_step", type=int, default=1,
                         help="Specification of incremental stepsize of L in step 1")
