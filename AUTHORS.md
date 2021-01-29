@@ -7,7 +7,7 @@ Project Leads
 * Daniel P. Jensen <danielperezjensen@gmail.com>
 * Dylan Prins <dylanjoepprins@gmail.com>
 * Jonathan van Westendorp <mrjonathavanvw@gmail.com>
-* Noah van Grinsven
+* Noah van Grinsven <noah@vangrinsven.com>
 
 Special Thanks to
 ------------
