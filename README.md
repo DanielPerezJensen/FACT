@@ -97,8 +97,8 @@ This can be used to create explanations for any explainer, as long as their `mod
 python generate_explanations.py --model_file your-own-model-gce_.....
 ```
 
-### Figure 3
-To re-create the sweeps as shown in Figure 3 you can run:
+### Figure 2
+To re-create the sweeps as shown in Figure 2 you can run:
 
 ```bash 
 python generate_explanations.py --model_file inceptionnet_mnist_38_gce_K1_L7_lambda005
@@ -116,8 +116,8 @@ Followed by:
 python generate_explanations.py --model_file inceptionnet_mnist_38_gce_K1_L7_lambda005
 ```
 
-### Figure 4
-To re-create the sweeps as shown in Figure 4 you can run:
+### Figure 3
+To re-create the sweeps as shown in Figure 3 you can run:
 ```bash
 python generate_explanations.py --model_file resnet_mnist_38_gce_K1_L7_lambda005
 ```
@@ -133,6 +133,43 @@ Followed by:
 ```bash
 python generate_explanations.py --model_file resnet_mnist_38_gce_K1_L7_lambda005
 ```
+
+### Figure 4
+To re-create the sweeps as shown in Figure 4 you can run:
+```bash
+python generate_explanations.py --model_file base_fmnist_034_gce_K2_L4_lambda004
+```
+
+This by default uses our provided trained models. If you first want to retrain the classifier and GCE run (assuming you didn't run the provided bash scripts already):
+
+```bash
+python train_classifier.py --model base --dataset fmnist --class_use 0 3 4 --epochs 80
+python train_GCE.py --model_file base_fmnist_034_classifier --train_steps 3000 --K 2 --L 4 --lam 0.04 --Nalpha 15 --Nbeta 75
+```
+
+Followed by:
+```bash
+python generate_explanations.py --model_file base_fmnist_034_gce_K2_L4_lambda004
+```
+
+### Figure 5
+To re-create the sweeps as shown in Figure 5 you can run:
+```bash
+python generate_explanations.py --model_file base_fmnist_034_gce_K2_L4_lambda007
+```
+
+This by default uses our provided trained models. If you first want to retrain the classifier and GCE run (assuming you didn't run the provided bash scripts already):
+
+```bash
+python train_classifier.py --model base --dataset fmnist --class_use 0 3 4 --epochs 80
+python train_GCE.py --model_file base_fmnist_38_classifier --train_steps 3000 --K 2 --L 4 --lam 0.07 --Nalpha 15 --Nbeta 75
+```
+
+Followed by:
+```bash
+python generate_explanations.py --model_file base_fmnist_034_gce_K2_L4_lambda007
+```
+
 
 ### Figure 6
 To re-create the sweeps as shown in Figure 6 you can run:
