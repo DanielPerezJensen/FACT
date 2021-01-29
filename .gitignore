@@ -131,8 +131,6 @@ dmypy.json
 # exclude compiled binaries
 bin/
 
-# exclude data from source control by default
-/datasets
 
 # exclude external models from source control
 /src/datasets/
