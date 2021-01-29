@@ -63,7 +63,8 @@ elif model_name.lower() == "your-own-model":
 
 You can then run:
 
-`python train_classifier.py --model your-own-model ...`
+```bash python train_classifier.py --model your-own-model ...
+```
 
 The classifiers will be stored in `models/classifiers/`.
 
@@ -73,7 +74,9 @@ To train an explainer for a classifier you can use `train_GCE.py`. This script a
 
 To for example train the inceptionnet classifier we trained above with 1 alpha factor and 7 beta factors, with a lambda of 0.05 you could call:
 
-`python train_GCE --model_file inceptionnet_mnist_38_classifier --K 1 --L 7 --lam 0.05`
+```bash
+python train_GCE --model_file inceptionnet_mnist_38_classifier --K 1 --L 7 --lam 0.05
+```
 
 To train all explainers we used to create our figures, you can run: `bash train_GCEs.sh`. This will launch a bash script that retrains all the models with the hyperparameters as they are found in our report.
 
@@ -92,24 +95,36 @@ This can be used to create explanations for any explainer, as long as their `mod
 ### Figure 3
 To re-create the sweeps as shown in Figure 3 you can run:
 
-`python generate_explanations.py --model_file inceptionnet_mnist_38_gce_K1_L7_lambda005`
+```bash 
+python generate_explanations.py --model_file inceptionnet_mnist_38_gce_K1_L7_lambda005
+```
 
 This by default uses our provided trained models. If you first want to retrain the classifier and GCE run (assuming you didn't run the provided bash scripts already):
 
-`python train_classifier.py --model inceptionnet --dataset mnist --class_use 3 8 --epochs 80`
-`python train_GCE.py --model_file inceptionnet_mnist_38_classifier --train_steps 8000 --K 1 --L 7 --lam 0.05 --Nalpha 15 --Nbeta 75`
+```bash 
+python train_classifier.py --model inceptionnet --dataset mnist --class_use 3 8 --epochs 80
+python train_GCE.py --model_file inceptionnet_mnist_38_classifier --train_steps 8000 --K 1 --L 7 --lam 0.05 --Nalpha 15 --Nbeta 75
+```
 
 Followed by:
-`python generate_explanations.py --model_file inceptionnet_mnist_38_gce_K1_L7_lambda005`
+```bash
+python generate_explanations.py --model_file inceptionnet_mnist_38_gce_K1_L7_lambda005
+```
 
 ### Figure 4
 To re-create the sweeps as shown in Figure 4 you can run:
-`python generate_explanations.py --model_file resnet_mnist_38_gce_K1_L7_lambda005`
+```bash
+python generate_explanations.py --model_file resnet_mnist_38_gce_K1_L7_lambda005
+```
 
 This by default uses our provided trained models. If you first want to retrain the classifier and GCE run (assuming you didn't run the provided bash scripts already):
 
-`python train_classifier.py --model resnet --dataset mnist --class_use 3 8 --epochs 80`
-`python train_GCE.py --model_file resnet_mnist_38_classifier --train_steps 8000 --K 1 --L 7 --lam 0.05 --Nalpha 15 --Nbeta 75`
+```bash
+python train_classifier.py --model resnet --dataset mnist --class_use 3 8 --epochs 80
+python train_GCE.py --model_file resnet_mnist_38_classifier --train_steps 8000 --K 1 --L 7 --lam 0.05 --Nalpha 15 --Nbeta 75
+```
 
 Followed by:
-`python generate_explanations.py --model_file resnet_mnist_38_gce_K1_L7_lambda005`
+```bash
+python generate_explanations.py --model_file resnet_mnist_38_gce_K1_L7_lambda005
+```
