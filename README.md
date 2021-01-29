@@ -63,7 +63,8 @@ elif model_name.lower() == "your-own-model":
 
 You can then run:
 
-```bash python train_classifier.py --model your-own-model ...
+```bash 
+python train_classifier.py --model your-own-model ...
 ```
 
 The classifiers will be stored in `models/classifiers/`.
@@ -86,11 +87,15 @@ Again this script can be used to work with your own classifier you just need to 
 ## Sweeps
 To generate the sweeps as are shown in for example Figure 3 you can use `generate_explanations.py`. It has one optional argument where you can specify what explainer to use to create the sweep. The default parameter is listed at the bottom of the file. To for example re-create the figure using the Inception-Net classifier we trained earlier you can run:
 
-`python generate_explanations.py --model_file inceptionnet_mnist_38_gce_K1_L7_lambda005`
+```bash
+python generate_explanations.py --model_file inceptionnet_mnist_38_gce_K1_L7_lambda005
+```
 
 This can be used to create explanations for any explainer, as long as their `model.pt` file is located in `models/GCEs`. To for example us your own trained classifier and explainer you can run:
 
-`python generate_explanations.py --model_file your-own-model-gce_.....`
+```bash
+python generate_explanations.py --model_file your-own-model-gce_.....
+```
 
 ### Figure 3
 To re-create the sweeps as shown in Figure 3 you can run:
