@@ -12,6 +12,9 @@ Reproducibility of"[Generative causal explanations of black-box classifiers](htt
 ├── load_cifar.py <- code for loading and using the cifar10 dataset
 ├── train_GCE.py <- training code for the general causal explainers
 ├── train_classifier.py <- training code for classifiers
+├── train_GCEs.sh
+├── train_classifiers.sh
+├── make_fig7.py
 ├── generate_explanations.py <- code for generating sweeps across latent space
 ├── models  <-
 	├── GCEs <- compiled general causal explainers
@@ -24,6 +27,8 @@ Reproducibility of"[Generative causal explanations of black-box classifiers](htt
 ├── reports <- generated project artefacts eg. visualisations or tables
     ├── figures <- all generated figures can be found here
     ├── params <- all parameter data can be found here
+    ├── results <- figures that are presented in our report
+    ├── results.ipynb <- notebook with all figures as presented in our report
 ├── src <- files gathered from repo of original paper
     ├── ...
     ├── ... 
