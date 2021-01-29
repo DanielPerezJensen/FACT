@@ -133,3 +133,27 @@ Followed by:
 ```bash
 python generate_explanations.py --model_file resnet_mnist_38_gce_K1_L7_lambda005
 ```
+
+### Figure 6
+To re-create the sweeps as shown in Figure 6 you can run:
+```bash
+python generate_explanations.py --model_file base_cifar_79_gce_K1_L16_lambda005
+```
+
+This by default uses our provided trained models. If you first want to retrain the classifier and GCE run (assuming you didn't run the provided bash scripts already):
+
+```bash
+python train_classifier.py --model base --dataset cifar --class_use 7 9 --epochs 150
+python train_GCE.py --model_file base_cifar_79_classifier --train_steps 4000 --K 1 --L 16 --lam 0.05 --Nalpha 20 --Nbeta 70
+```
+
+Followed by:
+```bash
+python generate_explanations.py --model_file base_cifar_79_gce_K1_L16_lambda005
+```
+
+### Figure 7
+To re-create the alpha sweep of Figure 7 you can run:
+```bash
+python make_fig7.py
+```
